@@ -7,7 +7,7 @@ Watch the Rx Zigduino output what you've input into the serial port of the Tx Zi
 
 #include <ZigduinoRadio.h>
 
-#define NODE_ID 0x0001
+#define NODE_ID 0x0007
 #define DST_ID 0x0008
 #define SRC_ID 0x0001
 
@@ -153,7 +153,7 @@ void loop() {
           
 
         } else {
-          Serial.println(" Hi now i am mode 0 ! ");
+          //Serial.println(" Hi now i am mode 0 ! ");
           uint8_t i = TX_HEADER_LEN + 3;
           uint8_t already_in_path = 0;
           while (RxBuffer[i] != '\0') {
@@ -260,6 +260,9 @@ void loop() {
 
 			Serial.print("backstr :");
 			Serial.println(backstr);
+
+                  Serial.print("Next Node: ");
+	          Serial.println(nextNode);
 
         } // middle
 

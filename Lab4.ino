@@ -96,6 +96,10 @@ void loop() {
 
 	uint8_t pktmd; // packet mode
 	uint8_t drop = 0;
+
+
+	//testttttttttttttttttt
+
 	if (has_RX() && (!fcs_failed)) {
 		pktmd = RxBuffer[TX_HEADER_LEN] - '0';
 		if ((pktmd - mode) == 1 && pktmd <= 2) {

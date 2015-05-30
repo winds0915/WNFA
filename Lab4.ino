@@ -12,12 +12,12 @@ Watch the Rx Zigduino output what you've input into the serial port of the Tx Zi
 #define SRC_ID 0x0001
 
 // node id of this node. change it with different boards
-#define CHANNEL 15      // check correspond frequency in SpectrumAnalyzer
+#define CHANNEL 17      // check correspond frequency in SpectrumAnalyzer
 #define TX_TRY_TIMES 10
 //5  // if TX_RETRY is set, pkt_Tx() will try x times before success
 #define TX_DO_CARRIER_SENSE 1
 #define TX_SOFT_ACK 1   // only affect RX part(send ACK by hw/sw). TX still check ACK by  hardware in this code. modify libraries if necessary.
-#define TX_SOFT_FCS 0
+#define TX_SOFT_FCS 1
 #define TX_RETRY 1      // pkt_Tx() retransmit packets if failed.
 #define TX_BACKOFF 100  // sleep time in ms
 #define TX_HEADER_LEN 9
@@ -53,6 +53,7 @@ unsigned long tt[101];
 uint8_t prenxt[2]; // previous and next node (src to dst) & (dst to src)
 // the setup() function is called when Zigduino staets or reset
 uint8_t threshold;
+uint8_t pathTable[9];
 
 void setup() {
   prenxt[0] = 0;
@@ -131,21 +132,27 @@ void loop() {
           TX_available = 0; //
           broadcast = 0; //
         } else if (NODE_ID == DST_ID) { //start back
+          
+          uint8_t endchar = TX_HEADER_LEN + 3;
+          while (RxBuffer[endchar] != '\0') {
+                endchar++;
+          } // find endchar 
+          
+          RxBuffer[endchar] = DST_ID + '0' ;
+          RxBuffer[endchar] = '\0' ;
+          
           reversepath();
-          for (int j = 12; j >= 1; j --) //shift temp to insert dst
-            temp[j] = temp[j - 1];
-
+                    
           strcpy(backstr, temp);
           backstr[0] = '1';
           backstr[1] = '1';
           backstr[2] = 'x';
-          backstr[3] = DST_ID + '0';
-
+        
           TX_available = 1;
           mode = 1 ;
 
           fillRoutingTbl();
-          nextNode = backstr[4] - '0';
+          nextNode = prenxt[1] - '0';
 
           Serial.println("start bbbbbbbbbbbbbbbbbbbbbbbbbbbbb") ;
           Serial.print(" backstr : ") ; 
@@ -190,59 +197,35 @@ void loop() {
       case 1 :
         if (NODE_ID == SRC_ID) {
 
-          reversepath();
-          strcpy(pingstr, temp);
+          //reversepath();
+          //strcpy(pingstr, temp);
+          
           pingidx = 1; // start to ping
           pingstr[0] = '2';
           pingstr[1] = '0' + DST_ID;
           pingstr[2] = pingidx;
-          pingstr[3] = SRC_ID + '0' ;
-          
-          
-          
           mode = 2;
           TX_available = 1;
-
+          
+          char tstr[21] = "Jizz In My Pants!";
+          for (int k = 3; k < 21; k++) {
+              pingstr[k] = tstr[k-3];
+          }
+          
           fillRoutingTbl();
           nextNode = prenxt[0] - '0';
 
           Serial.println(" Start pingggggggggggggggggggggggggggggggggggggg")  ;
-          
-          Serial.print("nextNode:::::::::");
-          Serial.println(nextNode);
-          
+                         
           Serial.print("pingstr is :  ");
           Serial.println(pingstr);
-
-          
-          /*
-          for (uint8_t i = 9 ; i < 20 ; i++) {
-            Serial.print(" Rx[ ");
-            Serial.print(i);
-            Serial.print(" ] = ");
-            Serial.print(RxBuffer[i] - '0');
-            Serial.print(" , ");
-          }
-          Serial.println(" ");
-
-          
-                          for (uint8_t i = 0 ; i < 12 ; i++){
-                                Serial.print(" pingstr[ ");
-                                Serial.print(i);
-                                Serial.print(" ] = ");
-                                Serial.print(pingstr[i]-'0');
-                                Serial.print(" , ");
-                          }
-                          Serial.println(" ");
-          */
-
-
+ 
         } // src
         else if (NODE_ID == DST_ID) {
 			TX_available = 0;
         } // dst
         else {
-			Serial.println("Hi now I am mode 1 !!") ;
+			
                         uint8_t i = TX_HEADER_LEN + 3;
           
 			while (RxBuffer[i] != '\0') {
@@ -252,7 +235,7 @@ void loop() {
 			TX_available = 1 ;
 
 			fillRoutingTbl();
-			nextNode = RxBuffer[i + 1] - '0';
+			nextNode = prenxt[1] - '0';
 
 			Serial.print("backstr :");
 			Serial.println(backstr);
@@ -291,32 +274,27 @@ void loop() {
           }
         } // src
         else if (NODE_ID == DST_ID) {
-          reversepath();
-          strcpy(pingstr, temp);
+         
+          char tstr[21] = "Jizz delicious!";
+          for (int k = 3; k < 21; k++) {
+              pingstr[k] = tstr[k-3];
+          }
+                    
           pingstr[0] = '2';
           pingstr[1] = '1';
-          pingstr[2] = RxBuffer[TX_HEADER_LEN + 2];
 
-          // nextNode = pingstr[4] - '0';
           nextNode = prenxt[1] - '0';
 
           TX_available = 1;
         } // dst
         else {
           uint8_t i = TX_HEADER_LEN + 3;
-          while (RxBuffer[i] != NODE_ID + '0') {
-            i++;
-          }
-
-          // nextNode = RxBuffer[i+1] - '0';
-
-          TX_available = 1;
-          i = TX_HEADER_LEN + 3;
           while (RxBuffer[i] != '\0') {
             i++;
           }
           strncpy(&pingstr[0], (char*)&RxBuffer[TX_HEADER_LEN], i - TX_HEADER_LEN);
-
+          TX_available = 1;
+          
           if (RxBuffer[TX_HEADER_LEN + 1] == (DST_ID + '0')) {
             nextNode = prenxt[0] - '0';
           } // src 2 dst
@@ -336,6 +314,9 @@ void loop() {
       default :
         Serial.println("default!");
       } // switch
+
+        Serial.print("nextNode:::::::::");
+        Serial.println(nextNode);
 
     } // not drop
 
@@ -707,25 +688,24 @@ void onXmitDone(radio_tx_done_t x) {
 }
 
 void reversepath() {
-  uint8_t pl = TX_HEADER_LEN + 3;
+  uint8_t pl = TX_HEADER_LEN + 3;  // path start index
   temp[0] = '0';
   temp[1] = '0';
   temp[2] = '0';
-  temp[3] = '0';
-  
+    
   if(NODE_ID == DST_ID) { 
-        while (RxBuffer[pl] != '\0') {
+        while (RxBuffer[pl] != '8') {
           pl++;
         } // find '8' position 
-        pl -= TX_HEADER_LEN ;
-      
-        for (int i = 3; i < pl; i++) {
-          temp[i] = RxBuffer[pl  + TX_HEADER_LEN - i + 2];
+       
+              
+        for (int i = 3; i <= pl; i++) {
+          temp[i] = RxBuffer[pl  + TX_HEADER_LEN - i + 3];
         }
-        temp[pl] = '\0';
+        temp[pl+1] = '\0';
   }
   
-  else if (NODE_ID == SRC_ID){
+  /*else if (NODE_ID == SRC_ID){
         while (RxBuffer[pl] != '1') {
           pl++;
         } // find '1' 's position
@@ -736,7 +716,7 @@ void reversepath() {
         }
         temp[pl+1] = '\0';
     
-  }
+  }*/
    
 }
 
@@ -765,7 +745,7 @@ void fillRoutingTbl() {
   if (NODE_ID == DST_ID) {
     prenxt[1] = backstr[4];
   } else if (NODE_ID == SRC_ID) {
-    prenxt[0] = pingstr[4];
+    prenxt[0] = backstr[i-1];
   } else {
     prenxt[0] = backstr[i - 1];
     prenxt[1] = backstr[i + 1];

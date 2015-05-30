@@ -139,7 +139,7 @@ void loop() {
           } // find endchar 
           
           RxBuffer[endchar] = DST_ID + '0' ;
-          RxBuffer[endchar] = '\0' ;
+          RxBuffer[endchar+1] = '\0' ;
           
           reversepath();
                     
@@ -697,7 +697,7 @@ void reversepath() {
         while (RxBuffer[pl] != '8') {
           pl++;
         } // find '8' position 
-       
+        pl -= TX_HEADER_LEN  ; 
               
         for (int i = 3; i <= pl; i++) {
           temp[i] = RxBuffer[pl  + TX_HEADER_LEN - i + 3];
@@ -705,7 +705,7 @@ void reversepath() {
         temp[pl+1] = '\0';
   }
   
-  /*else if (NODE_ID == SRC_ID){
+  else if (NODE_ID == SRC_ID){
         while (RxBuffer[pl] != '1') {
           pl++;
         } // find '1' 's position
@@ -716,7 +716,7 @@ void reversepath() {
         }
         temp[pl+1] = '\0';
     
-  }*/
+  }
    
 }
 

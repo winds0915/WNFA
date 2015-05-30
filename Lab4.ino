@@ -13,7 +13,7 @@ Watch the Rx Zigduino output what you've input into the serial port of the Tx Zi
 
 // node id of this node. change it with different boards
 #define CHANNEL 19      // check correspond frequency in SpectrumAnalyzer
-#define TX_TRY_TIMES 30
+#define TX_TRY_TIMES 10
 //5  // if TX_RETRY is set, pkt_Tx() will try x times before success
 #define TX_DO_CARRIER_SENSE 1
 #define TX_SOFT_ACK 1   // only affect RX part(send ACK by hw/sw). TX still check ACK by  hardware in this code. modify libraries if necessary.

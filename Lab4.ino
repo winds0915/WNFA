@@ -7,12 +7,12 @@ Watch the Rx Zigduino output what you've input into the serial port of the Tx Zi
 
 #include <ZigduinoRadio.h>
 
-#define NODE_ID 0x0007
+#define NODE_ID 0x0001
 #define DST_ID 0x0008
 #define SRC_ID 0x0001
 
 // node id of this node. change it with different boards
-#define CHANNEL 14      // check correspond frequency in SpectrumAnalyzer
+#define CHANNEL 15      // check correspond frequency in SpectrumAnalyzer
 #define TX_TRY_TIMES 10
 //5  // if TX_RETRY is set, pkt_Tx() will try x times before success
 #define TX_DO_CARRIER_SENSE 1
@@ -153,7 +153,7 @@ void loop() {
           
 
         } else {
-          //Serial.println(" Hi now i am mode 0 ! ");
+          Serial.println(" Hi now i am mode 0 ! ");
           uint8_t i = TX_HEADER_LEN + 3;
           uint8_t already_in_path = 0;
           while (RxBuffer[i] != '\0') {
@@ -197,20 +197,9 @@ void loop() {
           pingstr[1] = '0' + DST_ID;
           pingstr[2] = pingidx;
           pingstr[3] = SRC_ID + '0' ;
-          // nextNode = pingstr[4] - '0';
-          /*
-                                        uint8_t k = 3 ;
-                                        uint8_t flg = 0 ;
-
-                                        Serial.print("~~~");
-                                        while (1) {
-                                                while (pingstr[k] != '\0' && flg == 0) {
-                                                  Serial.print(pingstr[k]);
-                                                  k++;
-                                                }
-                                                flg = 1;
-                                        }
-          */
+          
+          
+          
           mode = 2;
           TX_available = 1;
 
@@ -218,6 +207,13 @@ void loop() {
           nextNode = prenxt[0] - '0';
 
           Serial.println(" Start pingggggggggggggggggggggggggggggggggggggg")  ;
+          
+          Serial.print("nextNode:::::::::");
+          Serial.println(nextNode);
+          
+          Serial.print("pingstr is :  ");
+          Serial.println(pingstr);
+
           
           /*
           for (uint8_t i = 9 ; i < 20 ; i++) {
@@ -261,9 +257,6 @@ void loop() {
 			Serial.print("backstr :");
 			Serial.println(backstr);
 
-                  Serial.print("Next Node: ");
-	          Serial.println(nextNode);
-
         } // middle
 
         //Serial.print("nextNode:::::::::");
@@ -291,6 +284,9 @@ void loop() {
               successful++;
               Serial.print("successssssssssss : ");
               Serial.println(successful);
+              
+              Serial.print("pingstr is :  ");
+              Serial.println(pingstr);
             } // no timeout
           }
         } // src
@@ -374,12 +370,20 @@ void loop() {
 
   if ((NODE_ID != SRC_ID) && (mode == 1)) {
     TX_available = 1;
+    
   }
 
   if (pingidx > 0 && pingidx <= 100) {
     Serial.print("pingidx:");
     Serial.print(pingidx);
     Serial.println("");
+    
+    Serial.print("nextNode:::::::::");
+    Serial.println(nextNode);
+        
+    Serial.print("pingstr is : ");
+    Serial.println(pingstr);    
+        
     TX_available = 1;
   } else if (pingidx > 100) {
     TX_available = 0;
@@ -708,16 +712,32 @@ void reversepath() {
   temp[1] = '0';
   temp[2] = '0';
   temp[3] = '0';
-
-  while (RxBuffer[pl] != '\0') {
-    pl++;
-  } // find path len
-  pl -= TX_HEADER_LEN ;
-
-  for (int i = 3; i < pl; i++) {
-    temp[i] = RxBuffer[pl  + TX_HEADER_LEN - i + 2];
+  
+  if(NODE_ID == DST_ID) { 
+        while (RxBuffer[pl] != '\0') {
+          pl++;
+        } // find '8' position 
+        pl -= TX_HEADER_LEN ;
+      
+        for (int i = 3; i < pl; i++) {
+          temp[i] = RxBuffer[pl  + TX_HEADER_LEN - i + 2];
+        }
+        temp[pl] = '\0';
   }
-  temp[pl] = '\0';
+  
+  else if (NODE_ID == SRC_ID){
+        while (RxBuffer[pl] != '1') {
+          pl++;
+        } // find '1' 's position
+        pl -= TX_HEADER_LEN  ; 
+                    
+        for (int i = 4; i <= pl; i++) {
+          temp[i] = RxBuffer[pl  + TX_HEADER_LEN - i + 3];
+        }
+        temp[pl+1] = '\0';
+    
+  }
+   
 }
 
 

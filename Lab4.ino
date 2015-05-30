@@ -221,6 +221,14 @@ void loop() {
           //reversepath();
           //strcpy(pingstr, temp);
           
+          uint8_t i = TX_HEADER_LEN + 3;
+          while (RxBuffer[i] != '\0') {
+		i++;
+	  }
+          strncpy(&backstr[0], (char*)&RxBuffer[TX_HEADER_LEN], i - TX_HEADER_LEN);
+          fillRoutingTbl();
+          nextNode = prenxt[0] - '0';
+          
           pingidx = 1; // start to ping
           pingstr[0] = '2';
           pingstr[1] = '0' + DST_ID;
@@ -232,10 +240,7 @@ void loop() {
           for (int k = 3; k < 8; k++) {
               pingstr[k] = tstr[k-3];
           }
-          
-          fillRoutingTbl();
-          nextNode = prenxt[0] - '0';
-
+                    
           Serial.println(" Start pingggggggggggggggggggggggggggggggggggggg")  ;
                          
           Serial.print("pingstr is :  ");

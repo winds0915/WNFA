@@ -300,7 +300,8 @@ void loop() {
           }
         } // src
         else if (NODE_ID == DST_ID) {
-         
+          uint8_t pktid = RxBuffer[TX_HEADER_LEN + 2] ; 
+          
           char tstr[5] = "Good";
           for (int k = 3; k < 8; k++) {
               pingstr[k] = tstr[k-3];
@@ -308,7 +309,8 @@ void loop() {
                     
           pingstr[0] = '2';
           pingstr[1] = '1';
-
+          pingstr[2] = pktid ;
+          
           nextNode = prenxt[1] - '0';
 
           TX_available = 1;
@@ -480,7 +482,7 @@ void loop() {
     }
   } // if need_TX
 
-  delay(3000);
+  delay(500);
 } // loop
 
 void init_header() {

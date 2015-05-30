@@ -102,12 +102,12 @@ void loop() {
 /*    Serial.print("pktmd:");
     Serial.print(pktmd);
 */    
-    Serial.print("mode: ");
-    Serial.println(mode);
+    //Serial.print("mode: ");
+    //Serial.println(mode);
     if ((pktmd - mode) == 1 && pktmd <= 2) {
       mode = pktmd;
       drop = 0;
-      Serial.println("Change mode !");
+      //Serial.println("Change mode !");
     } // change mode
     else if (pktmd == mode) {
       drop = 0;
@@ -117,16 +117,17 @@ void loop() {
     }
       
         cleanRx();
-        Serial.println("After clean Rx Buffer " ) ;
-        for (uint8_t i = 9 ; i < 20 ; i++) {
-          Serial.print(" Rx[ ");
-          Serial.print(i);
-          Serial.print(" ] = ");
-          Serial.print(RxBuffer[i]-'0');
-          Serial.print(" , ");
-        } // print packet
-        Serial.println(" ");
-    
+        if (NODE_ID == SRC_ID || NODE_ID == DST_ID){ 
+              Serial.println("After clean Rx Buffer " ) ;
+              for (uint8_t i = 9 ; i < 20 ; i++) {
+                Serial.print(" Rx[ ");
+                Serial.print(i);
+                Serial.print(" ] = ");
+                Serial.print(RxBuffer[i]-'0');
+                Serial.print(" , ");
+              } // print packet
+              Serial.println(" ");
+        }
     /*
     if (mode == 2 ) {   
         Serial.println("Mode 2 Rx Buffer : " ) ;
@@ -181,7 +182,7 @@ void loop() {
           
 
         } else {
-          Serial.println(" Hi now i am mode 0 ! ");
+          //Serial.println(" Hi now i am mode 0 ! ");
           uint8_t i = TX_HEADER_LEN + 3;
           uint8_t already_in_path = 0;
           while (RxBuffer[i] != '\0') {
@@ -331,7 +332,7 @@ void loop() {
           } // dst 2 src
           else {
             // ??????
-            Serial.println("WTF nextNode ???");
+            //Serial.println("WTF nextNode ???");
           }
 
 
@@ -387,8 +388,8 @@ void loop() {
     Serial.print(pingidx);
     Serial.println("");
     
-    Serial.print("nextNode:::::::::");
-    Serial.println(nextNode);
+    //Serial.print("nextNode:::::::::");
+    //Serial.println(nextNode);
         
     Serial.print("pingstr is : ");
     Serial.println(pingstr);    
@@ -414,7 +415,7 @@ void loop() {
 
     switch (mode) {
     case 0 :
-      Serial.println("Ready for broadcast!!");
+      Serial.println("Start broadcast!!");
 
       //teststr[3] = 'a' ;
 

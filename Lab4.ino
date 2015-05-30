@@ -109,10 +109,9 @@ void loop() {
       drop = 1;
       TX_available = 0;
     }
-
-    cleanRx();
-
-    //if (NODE_ID == SRC_ID || NODE_ID == DST_ID) {   
+    
+    if(mode != 2 ){
+        cleanRx();
         Serial.println("After clean Rx Buffer " ) ;
         for (uint8_t i = 9 ; i < 20 ; i++) {
           Serial.print(" Rx[ ");
@@ -122,7 +121,24 @@ void loop() {
           Serial.print(" , ");
         } // print packet
         Serial.println(" ");
-    //}  
+    }
+    
+    if (mode == 2 ) {   
+        Serial.println("Mode 2 Rx Buffer : " ) ;
+        for (uint8_t i = 9 ; i <= 11 ; i++) {
+            Serial.print(" Rx[ ");
+            Serial.print(i);
+            Serial.print(" ] = ");
+            Serial.print(RxBuffer[i]-'0');
+            Serial.print(" , ");
+        } // print packet
+        Serial.println(" ");
+        
+        for (uint8_t i = 12 ; i < 21 ; i++) {
+            Serial.print(RxBuffer[i]);
+        }
+    }  
+
 
     if (!drop) {
 

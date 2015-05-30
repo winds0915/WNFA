@@ -539,8 +539,6 @@ uint8_t pkt_Tx(uint16_t dst_addr, char* msg) {
 //        cca = ZigduinoRadio.doCca();
         rssi = ZigduinoRadio.getRssiNow();
         threshold = rssi - RSSI_BASE_VAL;
-        Serial.print("Threshold = ");
-        Serial.println(threshold);
 //      if(cca == RADIO_CCA_FREE)
 //      if(rssi == -91){
       if (threshold <= 10 || threshold == 255) {

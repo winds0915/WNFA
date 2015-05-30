@@ -102,12 +102,12 @@ void loop() {
 /*    Serial.print("pktmd:");
     Serial.print(pktmd);
 */    
-    Serial.print("m");
+    Serial.print("mode: ");
     Serial.println(mode);
     if ((pktmd - mode) == 1 && pktmd <= 2) {
       mode = pktmd;
       drop = 0;
-      Serial.println("Change");
+      Serial.println("Change mode !");
     } // change mode
     else if (pktmd == mode) {
       drop = 0;
@@ -115,8 +115,7 @@ void loop() {
       drop = 1;
       TX_available = 0;
     }
-    /*
-    if(mode != 2 ){
+      
         cleanRx();
         Serial.println("After clean Rx Buffer " ) ;
         for (uint8_t i = 9 ; i < 20 ; i++) {
@@ -127,8 +126,8 @@ void loop() {
           Serial.print(" , ");
         } // print packet
         Serial.println(" ");
-    }
-    */
+    
+    /*
     if (mode == 2 ) {   
         Serial.println("Mode 2 Rx Buffer : " ) ;
         for (uint8_t i = 9 ; i <= 11 ; i++) {
@@ -144,7 +143,7 @@ void loop() {
             Serial.print(RxBuffer[i]);
         
     }  
-
+    */
 
     if (!drop) {
 
@@ -229,8 +228,8 @@ void loop() {
           mode = 2;
           TX_available = 1;
           
-          char tstr[4] = "Jizz";
-          for (int k = 3; k < 7; k++) {
+          char tstr[5] = "Jizz";
+          for (int k = 3; k < 8; k++) {
               pingstr[k] = tstr[k-3];
           }
           
@@ -297,8 +296,8 @@ void loop() {
         } // src
         else if (NODE_ID == DST_ID) {
          
-          char tstr[4] = "Good!";
-          for (int k = 3; k < 7; k++) {
+          char tstr[5] = "Good";
+          for (int k = 3; k < 8; k++) {
               pingstr[k] = tstr[k-3];
           }
                     

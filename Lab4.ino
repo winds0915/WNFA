@@ -12,7 +12,7 @@ Watch the Rx Zigduino output what you've input into the serial port of the Tx Zi
 #define SRC_ID 0x0001
 
 // node id of this node. change it with different boards
-#define CHANNEL 19      // check correspond frequency in SpectrumAnalyzer
+#define CHANNEL 14      // check correspond frequency in SpectrumAnalyzer
 #define TX_TRY_TIMES 10
 //5  // if TX_RETRY is set, pkt_Tx() will try x times before success
 #define TX_DO_CARRIER_SENSE 1
@@ -111,7 +111,7 @@ void loop() {
 
     cleanRx();
 
-    if (NODE_ID == SRC_ID || NODE_ID == DST_ID) {   
+    //if (NODE_ID == SRC_ID || NODE_ID == DST_ID) {   
         Serial.println("After clean Rx Buffer " ) ;
         for (uint8_t i = 9 ; i < 20 ; i++) {
           Serial.print(" Rx[ ");
@@ -121,7 +121,7 @@ void loop() {
           Serial.print(" , ");
         } // print packet
         Serial.println(" ");
-    }  
+    //}  
 
     if (!drop) {
 
@@ -153,6 +153,7 @@ void loop() {
           
 
         } else {
+          Serial.println(" Hi now i am mode 0 ! ");
           uint8_t i = TX_HEADER_LEN + 3;
           uint8_t already_in_path = 0;
           while (RxBuffer[i] != '\0') {
@@ -245,7 +246,8 @@ void loop() {
 			TX_available = 0;
         } // dst
         else {
-			uint8_t i = TX_HEADER_LEN + 3;
+			Serial.println("Hi now I am mode 1 !!") ;
+                        uint8_t i = TX_HEADER_LEN + 3;
           
 			while (RxBuffer[i] != '\0') {
 				i++;
@@ -464,7 +466,7 @@ void loop() {
     }
   } // if need_TX
 
-  delay(500);
+  delay(3000);
 } // loop
 
 void init_header() {
@@ -539,6 +541,8 @@ uint8_t pkt_Tx(uint16_t dst_addr, char* msg) {
 //        cca = ZigduinoRadio.doCca();
         rssi = ZigduinoRadio.getRssiNow();
         threshold = rssi - RSSI_BASE_VAL;
+        //Serial.print("Threshold = ");
+        //Serial.println(threshold);
 //      if(cca == RADIO_CCA_FREE)
 //      if(rssi == -91){
       if (threshold <= 10 || threshold == 255) {

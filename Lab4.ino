@@ -416,7 +416,8 @@ void loop() {
       break ;
 
     case 1 :
-      //Serial.println("Ready for back!!") ;
+      Serial.print(" Sending backstr now : ") ;
+      Serial.println(backstr);
       /*
       for (uint8_t i = 0 ; i < 12 ; i++){
                    Serial.print(" backstr[ ");
@@ -432,7 +433,7 @@ void loop() {
 
     case 2 :
       //Serial.println("Tx case 2");
-
+        
       if (NODE_ID == SRC_ID) {
         tt[pingidx] = millis();
         pingstr[2] = pingidx;

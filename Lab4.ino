@@ -89,19 +89,25 @@ void setup() {
 }
 
 // the function is always running
-void loop() {
+void loop() { 
   uint8_t inbyte;
   uint8_t inhigh;
   uint8_t inlow;
   uint8_t tx_suc;
 
-  uint8_t pktmd; // packet mode
+  int pktmd; // packet mode
   uint8_t drop = 0;
   if (has_RX() && (!fcs_failed)) {
     pktmd = RxBuffer[TX_HEADER_LEN] - '0';
+/*    Serial.print("pktmd:");
+    Serial.print(pktmd);
+*/    
+    Serial.print("m");
+    Serial.println(mode);
     if ((pktmd - mode) == 1 && pktmd <= 2) {
       mode = pktmd;
       drop = 0;
+      Serial.println("Change");
     } // change mode
     else if (pktmd == mode) {
       drop = 0;
@@ -109,7 +115,7 @@ void loop() {
       drop = 1;
       TX_available = 0;
     }
-    
+    /*
     if(mode != 2 ){
         cleanRx();
         Serial.println("After clean Rx Buffer " ) ;
@@ -122,7 +128,7 @@ void loop() {
         } // print packet
         Serial.println(" ");
     }
-    
+    */
     if (mode == 2 ) {   
         Serial.println("Mode 2 Rx Buffer : " ) ;
         for (uint8_t i = 9 ; i <= 11 ; i++) {
@@ -134,9 +140,9 @@ void loop() {
         } // print packet
         Serial.println(" ");
         
-        for (uint8_t i = 12 ; i < 21 ; i++) {
+        for (uint8_t i = 12 ; i < 21 ; i++) 
             Serial.print(RxBuffer[i]);
-        }
+        
     }  
 
 
@@ -223,8 +229,8 @@ void loop() {
           mode = 2;
           TX_available = 1;
           
-          char tstr[21] = "Jizz In My Pants!";
-          for (int k = 3; k < 21; k++) {
+          char tstr[4] = "Jizz";
+          for (int k = 3; k < 7; k++) {
               pingstr[k] = tstr[k-3];
           }
           
@@ -291,8 +297,8 @@ void loop() {
         } // src
         else if (NODE_ID == DST_ID) {
          
-          char tstr[21] = "Jizz delicious!";
-          for (int k = 3; k < 21; k++) {
+          char tstr[4] = "Good!";
+          for (int k = 3; k < 7; k++) {
               pingstr[k] = tstr[k-3];
           }
                     

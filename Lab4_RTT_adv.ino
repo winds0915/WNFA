@@ -12,8 +12,8 @@ Watch the Rx Zigduino output what you've input into the serial port of the Tx Zi
 #define SRC_ID 0x0001
 
 // node id of this node. change it with different boards
-#define CHANNEL 17      // check correspond frequency in SpectrumAnalyzer
-#define TX_TRY_TIMES 5
+#define CHANNEL 26      // check correspond frequency in SpectrumAnalyzer
+#define TX_TRY_TIMES 10
 //5  // if TX_RETRY is set, pkt_Tx() will try x times before success
 #define TX_DO_CARRIER_SENSE 1
 #define TX_SOFT_ACK 1   // only affect RX part(send ACK by hw/sw). TX still check ACK by  hardware in this code. modify libraries if necessary.
@@ -22,7 +22,9 @@ Watch the Rx Zigduino output what you've input into the serial port of the Tx Zi
 #define TX_BACKOFF 100  // sleep time in ms
 #define TX_HEADER_LEN 9
 
-#define TIMEOUT 1500
+#define TIMEOUT 5000
+#define maxbacktime 10 
+
 
 uint8_t TxBuffer[128]; // can be used as header and full pkt.
 uint8_t RxBuffer[128];
@@ -55,6 +57,8 @@ uint8_t prenxt[2]; // previous and next node (src to dst) & (dst to src)
 uint8_t threshold;
 uint8_t pathTable[9];
 unsigned long tmp_PRTT;
+uint8_t nowtimes = 0 ;
+
 
 void setup() {
   prenxt[0] = 0;
@@ -270,8 +274,8 @@ void loop() {
 
         } // middle
 
-        //Serial.print("nextNode:::::::::");
-        //Serial.println(nextNode);
+        Serial.print("nextNode:::::::::");
+        Serial.println(nextNode);
 
         break ;
 
@@ -395,9 +399,12 @@ void loop() {
     */
 
   } // if has_RX
-
-  if ((NODE_ID != SRC_ID) && (mode == 1)) {
+  
+  
+  
+  if ((NODE_ID != SRC_ID) && (mode == 1) && nowtimes < maxbacktime ) {
     TX_available = 1;
+    nowtimes ++ ;
     
   }
 
@@ -516,7 +523,7 @@ void loop() {
     }
   } // if need_TX
 
-  delay(100);
+  delay(500);
 } // loop
 
 void init_header() {

@@ -23,6 +23,8 @@ Watch the Rx Zigduino output what you've input into the serial port of the Tx Zi
 #define TX_HEADER_LEN 9
 
 #define TIMEOUT 55667788
+#define FinalTimeout 180000
+
 #define maxbacktime 5 
 
 
@@ -434,7 +436,7 @@ void loop() {
             Serial.print("RTT 100:");
             Serial.println(tmp_PRTT);
        
-    if (tmp_PRTT > TIMEOUT) {
+    if (tmp_PRTT > FinalTimeout) {
       Serial.print("totalRTT:");
       Serial.println(totalRTT);
       Serial.print("Average totalRTT: ");

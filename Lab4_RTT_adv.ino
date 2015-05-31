@@ -36,7 +36,7 @@ char backstr[12] = "TT";
 char temp[12] = "TT";
 char pingstr[4] = "TT";
 
-uint8_t broadcast = 1 ;
+uint8_t broadcast = 0 ;
 uint8_t nextNode = 0;
 int count = 0;
 uint32_t totalRTT = 0;
@@ -198,7 +198,7 @@ void loop() {
             teststr[i] = NODE_ID + '0';
             teststr[i + 1] = '\0';
             TX_available = 1;
-            //broadcast = 10;
+            broadcast = 1;
 
             // Serial.print("teststr: ");
             // Serial.println(teststr);
@@ -411,15 +411,16 @@ void loop() {
     nowtimes ++ ;
     
   }
-
-  if (mode == 0 && broadcast > 0 ) {
-      --broadcast ;
-      TX_available = 1;
-  }
-  else if (mode == 0 && broadcast == 0){ 
-      TX_available = 0;
-  }  
-
+   if(NODE_ID != SRC_ID && NODE_ID != DST_ID ){
+        if (mode == 0 && broadcast > 0 ) {
+            --broadcast ;
+            TX_available = 1;
+        }
+        else if (mode == 0 && broadcast == 0 ){ 
+            TX_available = 0;
+        }  
+   }
+   
   if (pingidx > 0 && pingidx <= 100) {
     Serial.print("pingidx:");
     Serial.print(pingidx);

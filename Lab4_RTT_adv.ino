@@ -7,13 +7,13 @@ Watch the Rx Zigduino output what you've input into the serial port of the Tx Zi
 
 #include <ZigduinoRadio.h>
 
-#define NODE_ID 0x0002
+#define NODE_ID 0x0001
 #define DST_ID 0x0008
 #define SRC_ID 0x0001
 
 // node id of this node. change it with different boards
-#define CHANNEL 26      // check correspond frequency in SpectrumAnalyzer
-#define TX_TRY_TIMES 10
+#define CHANNEL 11      // check correspond frequency in SpectrumAnalyzer
+#define TX_TRY_TIMES 7
 //5  // if TX_RETRY is set, pkt_Tx() will try x times before success
 #define TX_DO_CARRIER_SENSE 1
 #define TX_SOFT_ACK 1   // only affect RX part(send ACK by hw/sw). TX still check ACK by  hardware in this code. modify libraries if necessary.
@@ -22,10 +22,10 @@ Watch the Rx Zigduino output what you've input into the serial port of the Tx Zi
 #define TX_BACKOFF 100  // sleep time in ms
 #define TX_HEADER_LEN 9
 
-#define TIMEOUT 55667788
-#define FinalTimeout 180000
+#define TIMEOUT 300000
+#define FinalTimeout 20000
 
-#define maxbacktime 5 
+#define maxbacktime 7 
 
 
 uint8_t TxBuffer[128]; // can be used as header and full pkt.
@@ -124,7 +124,7 @@ void loop() {
     }
       
         cleanRx();
-        //if (NODE_ID == SRC_ID || NODE_ID == DST_ID){ 
+        if (NODE_ID == SRC_ID || NODE_ID == DST_ID){ 
               Serial.println("After clean Rx Buffer " ) ;
               for (uint8_t i = 9 ; i < 20 ; i++) {
                 Serial.print(" Rx[ ");
@@ -134,7 +134,7 @@ void loop() {
                 Serial.print(" , ");
               } // print packet
               Serial.println(" ");
-        //}
+        }
     /*
     if (mode == 2 ) {   
         Serial.println("Mode 2 Rx Buffer : " ) ;
@@ -425,17 +425,17 @@ void loop() {
   } else if (pingidx > 100) {
     TX_available = 0;
     tnow = millis();
-      Serial.print("now 100");
+      /*Serial.print("now 100");
             Serial.print(":");
             Serial.println(tnow);
-
+     
             Serial.print("tt[100]:");
             Serial.println(tt[100]);
             
             tmp_PRTT = tnow - tt[100];
             Serial.print("RTT 100:");
             Serial.println(tmp_PRTT);
-       
+     */  
     if (tmp_PRTT > FinalTimeout) {
       Serial.print("totalRTT:");
       Serial.println(totalRTT);

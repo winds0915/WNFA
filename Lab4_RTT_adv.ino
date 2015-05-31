@@ -13,7 +13,7 @@ Watch the Rx Zigduino output what you've input into the serial port of the Tx Zi
 
 // node id of this node. change it with different boards
 #define CHANNEL 11      // check correspond frequency in SpectrumAnalyzer
-#define TX_TRY_TIMES 7
+#define TX_TRY_TIMES 5
 //5  // if TX_RETRY is set, pkt_Tx() will try x times before success
 #define TX_DO_CARRIER_SENSE 1
 #define TX_SOFT_ACK 1   // only affect RX part(send ACK by hw/sw). TX still check ACK by  hardware in this code. modify libraries if necessary.
@@ -23,9 +23,9 @@ Watch the Rx Zigduino output what you've input into the serial port of the Tx Zi
 #define TX_HEADER_LEN 9
 
 #define TIMEOUT 300000
-#define FinalTimeout 20000
+#define FinalTimeout 50000
 
-#define maxbacktime 7 
+#define maxbacktime 5 
 
 
 uint8_t TxBuffer[128]; // can be used as header and full pkt.
@@ -33,9 +33,8 @@ uint8_t RxBuffer[128];
 uint8_t softACK[8];
 char teststr[12] = "ABCDEFGHIJK";
 char backstr[12] = "TT";
-char pingstr[12] = "TT";
 char temp[12] = "TT";
-
+char pingstr[4] = "TT";
 
 uint8_t broadcast = 0 ;
 uint8_t nextNode = 0;
@@ -135,24 +134,7 @@ void loop() {
               } // print packet
               Serial.println(" ");
         }
-    /*
-    if (mode == 2 ) {   
-        Serial.println("Mode 2 Rx Buffer : " ) ;
-        for (uint8_t i = 9 ; i <= 11 ; i++) {
-            Serial.print(" Rx[ ");
-            Serial.print(i);
-            Serial.print(" ] = ");
-            Serial.print(RxBuffer[i]-'0');
-            Serial.print(" , ");
-        } // print packet
-        Serial.println(" ");
-        
-        for (uint8_t i = 12 ; i < 21 ; i++) 
-            Serial.print(RxBuffer[i]);
-        
-    }  
-    */
-
+   
     if (!drop) {
 
       switch (mode) {
@@ -170,6 +152,8 @@ void loop() {
           RxBuffer[endchar] = DST_ID + '0' ;
           RxBuffer[endchar+1] = '\0' ;
           
+          
+          
           reversepath();
                     
           strcpy(backstr, temp);
@@ -182,7 +166,7 @@ void loop() {
 
           fillRoutingTbl();
           nextNode = prenxt[1] - '0';
-
+          
           Serial.println("start bbbbbbbbbbbbbbbbbbbbbbbbbbbbb") ;
           Serial.print(" backstr : ") ; 
           Serial.println(backstr);
@@ -236,6 +220,22 @@ void loop() {
           strncpy(&backstr[0], (char*)&RxBuffer[TX_HEADER_LEN], i - TX_HEADER_LEN);
           fillRoutingTbl();
           nextNode = prenxt[0] - '0';
+
+          //strncpy(&pathTable[0] , (char*)&RxBuffer[TX_HEADER_LEN+3] , i - TX_HEADER_LEN) ; 
+         
+          uint8_t k = 0 ;
+          for (uint8_t j = i-1 ; j >= TX_HEADER_LEN + 3 ; j--){
+              pathTable[k] = RxBuffer[j] ; 
+              k++ ; 
+          }
+          pathTable[k+1] = '\0' ; 
+          Serial.print("pathtable:") ; 
+          for (uint8_t l = 0 ; l < 9 ; l++){
+              Serial.print(pathTable[l]);
+              if (pathTable[l] != '\0') 
+                   Serial.print(" -> "); 
+          }
+          Serial.println(" ");
           
           pingidx = 1; // start to ping
           pingstr[0] = '2';
@@ -281,7 +281,7 @@ void loop() {
 
         break ;
 
-      case 2 :
+       case 2 :
 /*
         Serial.print("backstr :");
         Serial.println(backstr);
@@ -410,6 +410,14 @@ void loop() {
     
   }
 
+  if (mode == 0 && broadcast > 0 ) {
+      --broadcast ;
+      TX_available = 1;
+  }
+  else if (mode == 0 && broadcast == 0){ 
+      TX_available = 0;
+  }  
+
   if (pingidx > 0 && pingidx <= 100) {
     Serial.print("pingidx:");
     Serial.print(pingidx);
@@ -520,9 +528,7 @@ void loop() {
       Serial.println("default!");
     } // switch mode
 
-    if (--broadcast) {
-      TX_available = 1;
-    }
+    
   } // if need_TX
 
   delay(500);

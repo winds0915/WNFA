@@ -7,7 +7,7 @@ Watch the Rx Zigduino output what you've input into the serial port of the Tx Zi
 
 #include <ZigduinoRadio.h>
 
-#define NODE_ID 0x0001
+#define NODE_ID 0x0002
 #define DST_ID 0x0008
 #define SRC_ID 0x0001
 
@@ -22,8 +22,8 @@ Watch the Rx Zigduino output what you've input into the serial port of the Tx Zi
 #define TX_BACKOFF 100  // sleep time in ms
 #define TX_HEADER_LEN 9
 
-#define TIMEOUT 5000
-#define maxbacktime 10 
+#define TIMEOUT 55667788
+#define maxbacktime 5 
 
 
 uint8_t TxBuffer[128]; // can be used as header and full pkt.
@@ -122,7 +122,7 @@ void loop() {
     }
       
         cleanRx();
-        if (NODE_ID == SRC_ID || NODE_ID == DST_ID){ 
+        //if (NODE_ID == SRC_ID || NODE_ID == DST_ID){ 
               Serial.println("After clean Rx Buffer " ) ;
               for (uint8_t i = 9 ; i < 20 ; i++) {
                 Serial.print(" Rx[ ");
@@ -132,7 +132,7 @@ void loop() {
                 Serial.print(" , ");
               } // print packet
               Serial.println(" ");
-        }
+        //}
     /*
     if (mode == 2 ) {   
         Serial.println("Mode 2 Rx Buffer : " ) ;

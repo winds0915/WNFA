@@ -12,12 +12,12 @@ Watch the Rx Zigduino output what you've input into the serial port of the Tx Zi
 #define SRC_ID 0x0001
 
 // node id of this node. change it with different boards
-#define CHANNEL 11      // check correspond frequency in SpectrumAnalyzer
-#define TX_TRY_TIMES 3
+#define CHANNEL 26      // check correspond frequency in SpectrumAnalyzer
+#define TX_TRY_TIMES 5
 //5  // if TX_RETRY is set, pkt_Tx() will try x times before success
 #define TX_DO_CARRIER_SENSE 1
 #define TX_SOFT_ACK 1   // only affect RX part(send ACK by hw/sw). TX still check ACK by  hardware in this code. modify libraries if necessary.
-#define TX_SOFT_FCS 0
+#define TX_SOFT_FCS 1
 #define TX_RETRY 1      // pkt_Tx() retransmit packets if failed.
 #define TX_BACKOFF 100  // sleep time in ms
 #define TX_HEADER_LEN 9
@@ -232,7 +232,7 @@ void loop() {
           Serial.print("pathtable:") ; 
           for (uint8_t l = 0 ; l < 9 ; l++){
               Serial.print(pathTable[l]-'0');
-              if (pathTable[l] != 0- '0' ) 
+              if (pathTable[l] != 0 ) 
                    Serial.print(" -> ");
               else 
                   break ; 
@@ -442,11 +442,11 @@ void loop() {
      
             Serial.print("tt[100]:");
             Serial.println(tt[100]);
-            
+     */       
             tmp_PRTT = tnow - tt[100];
             Serial.print("RTT 100:");
             Serial.println(tmp_PRTT);
-     */  
+       
     if (tmp_PRTT > FinalTimeout) {
       Serial.print("totalRTT:");
       Serial.println(totalRTT);

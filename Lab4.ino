@@ -22,7 +22,7 @@ Watch the Rx Zigduino output what you've input into the serial port of the Tx Zi
 #define TX_BACKOFF 100  // sleep time in ms
 #define TX_HEADER_LEN 9
 
-#define TIMEOUT 10000
+#define TIMEOUT 5000
 
 uint8_t TxBuffer[128]; // can be used as header and full pkt.
 uint8_t RxBuffer[128];
@@ -54,6 +54,7 @@ uint8_t prenxt[2]; // previous and next node (src to dst) & (dst to src)
 // the setup() function is called when Zigduino staets or reset
 uint8_t threshold;
 uint8_t pathTable[9];
+
 
 void setup() {
   prenxt[0] = 0;
@@ -128,24 +129,7 @@ void loop() {
               } // print packet
               Serial.println(" ");
         }
-    /*
-    if (mode == 2 ) {   
-        Serial.println("Mode 2 Rx Buffer : " ) ;
-        for (uint8_t i = 9 ; i <= 11 ; i++) {
-            Serial.print(" Rx[ ");
-            Serial.print(i);
-            Serial.print(" ] = ");
-            Serial.print(RxBuffer[i]-'0');
-            Serial.print(" , ");
-        } // print packet
-        Serial.println(" ");
-        
-        for (uint8_t i = 12 ; i < 21 ; i++) 
-            Serial.print(RxBuffer[i]);
-        
-    }  
-    */
-
+   
     if (!drop) {
 
       switch (mode) {
@@ -227,8 +211,17 @@ void loop() {
 		i++;
 	  }
           strncpy(&backstr[0], (char*)&RxBuffer[TX_HEADER_LEN], i - TX_HEADER_LEN);
+          /*
+          uint8_t idx = 0 ;
+          for(uint8_t j = i-1 ; j >= 3+TX_HEADER_LEN ; j--){
+             pathTable[idx] = RxBuffer[j] ;
+             idx ++ ; 
+          }
+          pathTable[idx+1] = '\0' ; 
+          */
+          
           fillRoutingTbl();
-          nextNode = prenxt[0] - '0';
+          nextNode = prenxt[0] - '0'; 
           
           pingidx = 1; // start to ping
           pingstr[0] = '2';
@@ -399,6 +392,14 @@ void loop() {
     TX_available = 0;
     tnow = millis();
     if (tnow - tt[100] > TIMEOUT) {
+      Serial.print("pathTable : "); 
+      
+      for(uint8_t k = 0 ; k < 9 ; k++ ){
+         Serial.print(pathTable[k]);
+         if (pathTable[k] != '\0') 
+             Serial.print(" -> "); 
+      }
+      
       Serial.print("totalRTT:");
       Serial.println(totalRTT);
       Serial.print("Average totalRTT: ");
@@ -411,7 +412,8 @@ void loop() {
   } // ping index > 100
 
   if (need_TX()) {
-    delay(TX_BACKOFF);
+    
+   delay(TX_BACKOFF);
 
     switch (mode) {
     case 0 :
@@ -483,7 +485,7 @@ void loop() {
     }
   } // if need_TX
 
-  delay(500);
+  delay(100);
 } // loop
 
 void init_header() {
@@ -571,6 +573,7 @@ uint8_t pkt_Tx(uint16_t dst_addr, char* msg) {
       } else {
         ZigduinoRadio.txFrame(TxBuffer, pkt_len);
       }
+             
       delay(TX_BACKOFF);
     }
     retry_c--; // extra 1 by for loop, if tx success retry_c == TX_TRY_TIMES

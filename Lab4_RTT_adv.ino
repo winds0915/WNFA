@@ -16,14 +16,14 @@ Watch the Rx Zigduino output what you've input into the serial port of the Tx Zi
 #define TX_TRY_TIMES 5
 //5  // if TX_RETRY is set, pkt_Tx() will try x times before success
 #define TX_DO_CARRIER_SENSE 1
-#define TX_SOFT_ACK 1   // only affect RX part(send ACK by hw/sw). TX still check ACK by  hardware in this code. modify libraries if necessary.
+#define TX_SOFT_ACK 0   // only affect RX part(send ACK by hw/sw). TX still check ACK by  hardware in this code. modify libraries if necessary.
 #define TX_SOFT_FCS 1
-#define TX_RETRY 1      // pkt_Tx() retransmit packets if failed.
+#define TX_RETRY 0      // pkt_Tx() retransmit packets if failed.
 #define TX_BACKOFF 100  // sleep time in ms
 #define TX_HEADER_LEN 9
 
-#define TIMEOUT 300000
-#define FinalTimeout 18000
+#define TIMEOUT 3000
+#define FinalTimeout 1800
 
 #define maxbacktime 3 
 
@@ -123,7 +123,7 @@ void loop() {
     }
       
         cleanRx();
-        if (NODE_ID == SRC_ID || NODE_ID == DST_ID){ 
+        /*if (NODE_ID == SRC_ID || NODE_ID == DST_ID){ 
               Serial.println("After clean Rx Buffer " ) ;
               for (uint8_t i = 9 ; i < 20 ; i++) {
                 Serial.print(" Rx[ ");
@@ -134,7 +134,7 @@ void loop() {
               } // print packet
               Serial.println(" ");
         }
-   
+         */
     if (!drop) {
 
       switch (mode) {
@@ -534,7 +534,7 @@ void loop() {
     
   } // if need_TX
 
-  delay(500);
+  delay(100);
 } // loop
 
 void init_header() {

@@ -22,8 +22,8 @@ Watch the Rx Zigduino output what you've input into the serial port of the Tx Zi
 #define TX_BACKOFF 100  // sleep time in ms
 #define TX_HEADER_LEN 9
 
-#define TIMEOUT 5000
-#define FinalTimeout 1800
+#define TIMEOUT 10000
+#define FinalTimeout 18000
 
 #define maxbacktime 10
 #define DTIME 500

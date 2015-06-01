@@ -12,7 +12,7 @@ Watch the Rx Zigduino output what you've input into the serial port of the Tx Zi
 #define SRC_ID 0x0001
 
 // node id of this node. change it with different boards
-#define CHANNEL 17      // check correspond frequency in SpectrumAnalyzer
+#define CHANNEL 11      // check correspond frequency in SpectrumAnalyzer
 #define TX_TRY_TIMES 10
 //5  // if TX_RETRY is set, pkt_Tx() will try x times before success
 #define TX_DO_CARRIER_SENSE 1
@@ -571,7 +571,7 @@ uint8_t pkt_Tx(uint16_t dst_addr, char* msg) {
     for (retry_c = 0; retry_c < TX_TRY_TIMES; retry_c++) {
       if (TX_DO_CARRIER_SENSE) {
 //        cca = ZigduinoRadio.doCca();
-       // rssi = ZigduinoRadio.getRssiNow();
+        rssi = ZigduinoRadio.getRssiNow();
        // threshold = rssi - RSSI_BASE_VAL;
         //Serial.print("Threshold = ");
         //Serial.println(threshold);

@@ -457,7 +457,7 @@ void loop() {
                   rststr[4] = '\0';
                   
                   TX_available = 1;
-                  broadcast = 1;
+                  broadcast = 10;
       }  // reset
 
   if ((NODE_ID != SRC_ID) && (mode == 1)) {

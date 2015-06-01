@@ -692,11 +692,24 @@ uint16_t cal_fcs(uint8_t* frm, uint8_t len) {
 }
 
 //==================================CRC Computation==================
-const uint8_t CRC7_POLY = 0x91;
+//const uint8_t CRC7_POLY = 0x91;
 
 uint16_t cal_crc(uint8_t* frm, uint8_t length, uint8_t HEADER_LEN) {
-  uint8_t i, j, crc = 0;
+  uint8_t i, j, crc = 0xffff;
 
+while(length--){
+  crc ^= *frm++;
+  for(j = 0 ; j < 8 ; j++){
+    if(crc & 0x01)
+      crc=(crc>>1)^0xA001;
+    else
+      crc=crc>>1;
+  }
+  return crc;
+}
+}
+
+/*
   for (i = 0; i < length; i++) {
     crc ^= frm[HEADER_LEN + i];
     for (j = 0; j < 8; j++) {
@@ -707,7 +720,7 @@ uint16_t cal_crc(uint8_t* frm, uint8_t length, uint8_t HEADER_LEN) {
   }
   return crc;
 }
-
+*/
 //===================================================================
 
 uint8_t printable(uint8_t in) {
@@ -809,4 +822,3 @@ void fillRoutingTbl() {
   Serial.print(prenxt[1]);
   Serial.println("]");
 }
-

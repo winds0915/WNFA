@@ -7,7 +7,7 @@ Watch the Rx Zigduino output what you've input into the serial port of the Tx Zi
 
 #include <ZigduinoRadio.h>
 
-#define NODE_ID 0x0001
+#define NODE_ID 0x0008
 #define DST_ID 0x0008
 #define SRC_ID 0x0001
 
@@ -209,8 +209,8 @@ void loop() {
           
           uint8_t i = TX_HEADER_LEN + 3;
           while (RxBuffer[i] != '\0') {
-		i++;
-	  }
+    i++;
+    }
           strncpy(&backstr[0], (char*)&RxBuffer[TX_HEADER_LEN], i - TX_HEADER_LEN);
           /*
           uint8_t idx = 0 ;
@@ -243,23 +243,23 @@ void loop() {
  
         } // src
         else if (NODE_ID == DST_ID) {
-			TX_available = 0;
+      TX_available = 0;
         } // dst
         else {
-			
+      
                         uint8_t i = TX_HEADER_LEN + 3;
           
-			while (RxBuffer[i] != '\0') {
-				i++;
-			}
-			strncpy(&backstr[0], (char*)&RxBuffer[TX_HEADER_LEN], i - TX_HEADER_LEN);
-			TX_available = 1 ;
+      while (RxBuffer[i] != '\0') {
+        i++;
+      }
+      strncpy(&backstr[0], (char*)&RxBuffer[TX_HEADER_LEN], i - TX_HEADER_LEN);
+      TX_available = 1 ;
 
-			fillRoutingTbl();
-			nextNode = prenxt[1] - '0';
+      fillRoutingTbl();
+      nextNode = prenxt[1] - '0';
 
-			Serial.print("backstr :");
-			Serial.println(backstr);
+      Serial.print("backstr :");
+      Serial.println(backstr);
 
         } // middle
 
@@ -580,12 +580,12 @@ uint8_t pkt_Tx(uint16_t dst_addr, char* msg) {
       if (TX_DO_CARRIER_SENSE) {
 //        cca = ZigduinoRadio.doCca();
         rssi = ZigduinoRadio.getRssiNow();
-        threshold = rssi - RSSI_BASE_VAL;
+        //threshold = rssi - RSSI_BASE_VAL;
         //Serial.print("Threshold = ");
         //Serial.println(threshold);
 //      if(cca == RADIO_CCA_FREE)
-//      if(rssi == -91){
-      if (threshold <= 10 || threshold == 255) {
+      if(rssi == -91){
+//      if (threshold <= 10 || threshold == 255) {
           ZigduinoRadio.txFrame(TxBuffer, pkt_len);
       } else {
           Serial.print("ca fail with rssi = ");
@@ -602,10 +602,10 @@ uint8_t pkt_Tx(uint16_t dst_addr, char* msg) {
     if (TX_DO_CARRIER_SENSE) {
 //      cca = ZigduinoRadio.doCca();
       rssi = ZigduinoRadio.getRssiNow();
-      threshold = rssi - RSSI_BASE_VAL;
+//      threshold = rssi - RSSI_BASE_VAL;
 //      if(cca == RADIO_CCA_FREE)
-//      if(rssi == -91){
-      if (threshold <= 10 || threshold == 255) {
+      if(rssi == -91){
+//      if (threshold <= 10 || threshold == 255) {
         ZigduinoRadio.txFrame(TxBuffer, pkt_len);
       } else {
         Serial.print("ca fail with rssi = ");

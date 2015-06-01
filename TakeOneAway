@@ -432,7 +432,7 @@ void loop() {
   } // if has_RX
 
   // start reset
-   if ((millis() - lastpktt) >= RSTT && mode == 2) {
+   if ((millis() - lastpktt) >= RSTT && mode == 2 && NODE_ID == SRC_ID) {
                   Serial.println("Resettttt : ");
                   mode = 3;
                   

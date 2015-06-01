@@ -12,7 +12,7 @@ Watch the Rx Zigduino output what you've input into the serial port of the Tx Zi
 #define SRC_ID 0x0001
 
 // node id of this node. change it with different boards
-#define CHANNEL 11      // check correspond frequency in SpectrumAnalyzer
+#define CHANNEL 17    // check correspond frequency in SpectrumAnalyzer
 #define TX_TRY_TIMES 10
 //5  // if TX_RETRY is set, pkt_Tx() will try x times before success
 #define TX_DO_CARRIER_SENSE 1
@@ -24,7 +24,7 @@ Watch the Rx Zigduino output what you've input into the serial port of the Tx Zi
 #define FinalTimeout 20000
 
 #define TIMEOUT 20000
-#define RSTT 200000 
+#define RSTT 25000 
 
 
 uint8_t TxBuffer[128]; // can be used as header and full pkt.
@@ -242,7 +242,7 @@ void loop() {
           }
                     
           Serial.println(" Start pingggggggggggggggggggggggggggggggggggggg")  ;
-                         
+          lastpktt = millis();               
           Serial.print("pingstr is :  ");
           Serial.println(pingstr);
  
@@ -307,41 +307,14 @@ void loop() {
             
             if (tmp_PRTT <= TIMEOUT) {
               totalRTT += tmp_PRTT;
+              lastpktt = millis();
               successful++;
               Serial.print("successssssssssss : ");
               Serial.println(successful);
               
               Serial.print("pingstr is :  ");
               Serial.println(pingstr);
-              
-              // start reset
-              if ((tnow - lastpktt) >= RSTT) {
-                  Serial.println("Resettttt : ");
-                  mode = 3;
-                  
-                  totalRTT = 0;
-                  successful = 0; 
-                  pingidx = 0;
-                  prenxt[0] = 0;
-                  prenxt[1] = 0;
-                  lastpktt = 0;
-                  uint8_t kk = 0;
-                  for (kk = 0; kk < 9; kk++) {
-                    pathTable[kk] = 0;
-                  }
-                   for (kk = 0; kk < 101; kk++) {
-                      tt[kk] = 0;
-                  }            
-                  
-                  rststr[0] = '3';
-                  rststr[1] = '8';
-                  rststr[2] = 'y';
-                  rststr[3] = '0' + NODE_ID;
-                  rststr[4] = '\0';
-                  
-                  TX_available = 1;
-                  broadcast = 1;
-                }  // reset
+            
             } // no timeout
           }
         } // src
@@ -457,6 +430,35 @@ void loop() {
     */
 
   } // if has_RX
+
+  // start reset
+   if ((millis() - lastpktt) >= RSTT && mode == 2) {
+                  Serial.println("Resettttt : ");
+                  mode = 3;
+                  
+                  totalRTT = 0;
+                  successful = 0; 
+                  pingidx = 0;
+                  prenxt[0] = 0;
+                  prenxt[1] = 0;
+                  lastpktt = 0;
+                  uint8_t kk = 0;
+                  for (kk = 0; kk < 9; kk++) {
+                    pathTable[kk] = 0;
+                  }
+                   for (kk = 0; kk < 101; kk++) {
+                      tt[kk] = 0;
+                  }            
+                  
+                  rststr[0] = '3';
+                  rststr[1] = '8';
+                  rststr[2] = 'y';
+                  rststr[3] = '0' + NODE_ID;
+                  rststr[4] = '\0';
+                  
+                  TX_available = 1;
+                  broadcast = 1;
+      }  // reset
 
   if ((NODE_ID != SRC_ID) && (mode == 1)) {
     TX_available = 1;
@@ -890,6 +892,9 @@ void fillRoutingTbl() {
 }
 
 void mysetup() {
+  Serial.print("mode is ");
+  Serial.println(mode);
+  
   prenxt[0] = 0;
   prenxt[1] = 0;
 
@@ -907,6 +912,17 @@ void mysetup() {
     TX_available = 0;
   }
 
-  RX_available = 1;
+  RX_available = 0;
+  ZigduinoRadio.begin(CHANNEL, TxBuffer);
+  ZigduinoRadio.setParam(phyPanId, (uint16_t)0xABCD );
+  ZigduinoRadio.setParam(phyShortAddr, (uint16_t)NODE_ID );
+  ZigduinoRadio.setParam(phyCCAMode, (uint8_t)3);
+  Serial.begin(9600);
+
+  // register event handlers
+  ZigduinoRadio.attachError(errHandle);
+  ZigduinoRadio.attachTxDone(onXmitDone);
+  ZigduinoRadio.attachReceiveFrame(pkt_Rx);
+
 
 }
